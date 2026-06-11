@@ -30,12 +30,10 @@ export default function Home() {
                             })
                         }
                     >
-                        {/* Fixed: Changed from <text> to <Text> */}
                         <Text style={styles.titulo}>
                             {item.titulo}
                         </Text>
 
-                        {/* Fixed: Changed from <text> to <Text> */}
                         <Text>
                             Data: {item.data}
                         </Text>

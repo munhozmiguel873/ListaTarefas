@@ -6,20 +6,20 @@ export const tasks: Task[] = [
         titulo: "Prova de PPDM",
         data: "20/06/2024",
         categoria: "Prova",
-        descricao: "Estudar Expo Router e TypeScript"
+        descricao: "Estudar para prova de PPDM"
     },
     {
         id: "2",
         titulo: "Entrega de BCD",
         data: "25/06/2026",
         categoria: "Trabalho",
-        descricao: "Finalizar modelagem do banco"
+        descricao: "Entregar trabalho de BCD"
     },
     {
         id: "3",
         titulo: "Atividade React Native",
         data: "Atividade",
         categoria: "Atividade",
-        descricao: "Criar aplicação com FlatList"
+        descricao: "Realizar atividade de React Native"
     }
 ];

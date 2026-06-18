@@ -3,25 +3,37 @@ import { StyleSheet, Text, View, FlatList, TextInput, TouchableOpacity, Alert, M
 import { useRouter } from "expo-router";
 import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
 
-interface Task {
+// ==========================================
+// ESTRUTURA DE DADOS E TIPAGEM (DATA)
+// ==========================================
+export interface Task {
     id: string;
     title: string;
     description: string;
+    startDate: string; // Nova propriedade
+    endDate: string;   // Nova propriedade
 }
 
 const initialTasks: Task[] = [
-    { id: '1', title: 'Estudar React Native', description: 'Rever conceitos de Hooks.' },
-    { id: '2', title: 'Acabar projeto', description: 'Finalizar a aplicação de lista de tarefas.' },
-    { id: '3', title: 'Terminar Sprints', description: 'Concluir as sprints do projeto.' }
+    { id: '1', title: 'Estudar React Native', description: 'Rever conceitos de Hooks.', startDate: '15/06/2026', endDate: '20/06/2026' },
+    { id: '2', title: 'Acabar projeto', description: 'Finalizar a aplicação de lista de tarefas.', startDate: '18/06/2026', endDate: '25/06/2026' },
+    { id: '3', title: 'Terminar Sprints', description: 'Concluir as sprints do projeto.', startDate: '01/06/2026', endDate: '30/06/2026' }
 ];
 
+// ==========================================
+// COMPONENTE PRINCIPAL
+// ==========================================
 export default function HomeScreen() {
     const router = useRouter();
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
     const [search, setSearch] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
+    
+    // States para o cadastro de nova tarefa
     const [newTitle, setNewTitle] = useState('');
     const [newDescription, setNewDescription] = useState('');
+    const [newStartDate, setNewStartDate] = useState('');
+    const [newEndDate, setNewEndDate] = useState('');
 
     useEffect(() => {
         if (Platform.OS === 'web') {
@@ -37,10 +49,22 @@ export default function HomeScreen() {
 
     const handleAddTask = () => {
         if (!newTitle.trim()) return;
-        const newTask: Task = { id: Math.random().toString(), title: newTitle, description: newDescription };
+        
+        const newTask: Task = { 
+            id: Math.random().toString(), 
+            title: newTitle, 
+            description: newDescription,
+            startDate: newStartDate || 'Não informada',
+            endDate: newEndDate || 'Não informada'
+        };
+
         setTasks([...tasks, newTask]);
+        
+        // Limpar campos
         setNewTitle('');
         setNewDescription('');
+        setNewStartDate('');
+        setNewEndDate('');
         setModalVisible(false);
     };
 
@@ -94,11 +118,17 @@ export default function HomeScreen() {
                             <TouchableOpacity
                                 style={styles.cardContainer}
                                 activeOpacity={0.7}
-                                onPress={() => router.push(`/detalhes?titulo=${item.title}&descricao=${item.description}` as any)}
+                                onPress={() => router.push(`/detalhes?titulo=${item.title}&descricao=${item.description}&inicio=${item.startDate}&fim=${item.endDate}` as any)}
                             >
                                 <View style={styles.cardLeft}>
                                     <Text style={styles.cardTitle}>{item.title}</Text>
-                                    <Text numberOfLines={1}>{item.description}</Text>
+                                    <Text numberOfLines={1} style={styles.cardDescription}>{item.description}</Text>
+                                    
+                                    {/* Exibição das Datas de Início e Fim */}
+                                    <View style={styles.dateContainer}>
+                                        <Text style={styles.dateText}>📅 Início: {item.startDate}</Text>
+                                        <Text style={styles.dateText}>🏁 Fim: {item.endDate}</Text>
+                                    </View>
                                 </View>
                             </TouchableOpacity>
                         </Swipeable>
@@ -109,12 +139,21 @@ export default function HomeScreen() {
                     <Text style={styles.fabText}>+</Text>
                 </TouchableOpacity>
 
+                {/* Modal para Adicionar Tarefa com Datas */}
                 <Modal visible={modalVisible} animationType="fade" transparent={true}>
                     <View style={styles.modalContainer}>
                         <View style={styles.modalContent}>
                             <Text style={styles.modalTitle}>Adicionar Nova Tarefa</Text>
+                            
                             <TextInput style={styles.modalInput} placeholder="Título" value={newTitle} onChangeText={setNewTitle} />
                             <TextInput style={styles.modalInput} placeholder="Descrição" value={newDescription} onChangeText={setNewDescription} />
+                            
+                            {/* Novos Inputs de Data */}
+                            <View style={styles.modalRow}>
+                                <TextInput style={[styles.modalInput, { flex: 1, marginRight: 5 }]} placeholder="Início (DD/MM/AAAA)" value={newStartDate} onChangeText={setNewStartDate} />
+                                <TextInput style={[styles.modalInput, { flex: 1, marginLeft: 5 }]} placeholder="Fim (DD/MM/AAAA)" value={newEndDate} onChangeText={setNewEndDate} />
+                            </View>
+
                             <View style={styles.modalButtons}>
                                 <Button title="Cancelar" onPress={() => setModalVisible(false)} />
                                 <Button title="Adicionar" onPress={handleAddTask} />
@@ -127,6 +166,9 @@ export default function HomeScreen() {
     );
 }
 
+// ==========================================
+// ESTILIZAÇÃO
+// ==========================================
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 16, paddingTop: 50, backgroundColor: "#f5f5f5" },
     searchInput: { borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 8, marginBottom: 10, backgroundColor: '#fff' },
@@ -143,25 +185,26 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     cardLeft: { flex: 1, padding: 16 },
-    cardTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 8 },
+    cardTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 4 },
+    cardDescription: { color: '#666', marginBottom: 8 },
+    dateContainer: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4, borderTopWidth: 0.5, borderColor: '#eee', paddingTop: 6 },
+    dateText: { fontSize: 12, color: '#444', fontWeight: '500' },
     deleteSwipeButton: {
         backgroundColor: '#FF3B30',
         justifyContent: 'center',
         alignItems: 'center',
         width: 80,
-        height: '84%',
+        height: '88%',
         borderRadius: 10,
         marginBottom: 10,
     },
-    deleteSwipeText: {
-        color: '#fff',
-        fontWeight: 'bold',
-    },
+    deleteSwipeText: { color: '#fff', fontWeight: 'bold' },
     fab: { position: 'absolute', right: 20, bottom: 30, backgroundColor: '#007AFF', width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', elevation: 5 },
     fabText: { color: '#fff', fontSize: 30 },
     modalContainer: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)', padding: 20 },
     modalContent: { backgroundColor: 'white', padding: 20, borderRadius: 10 },
     modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 15 },
     modalInput: { borderWidth: 1, borderColor: '#ccc', padding: 10, borderRadius: 5, marginBottom: 10 },
-    modalButtons: { flexDirection: 'row', justifyContent: 'space-between' }
+    modalRow: { flexDirection: 'row', justifyContent: 'space-between' },
+    modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }
 });

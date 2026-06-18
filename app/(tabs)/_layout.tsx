@@ -8,10 +8,10 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="index"
                 options={{
-                    title: "Home",
+                    title: "Tarefas",
                     tabBarIcon: ({ color, size }) => (
                         <Ionicons
-                            name="home"
+                            name="list"
                             size={size}
                             color={color}
                         />
